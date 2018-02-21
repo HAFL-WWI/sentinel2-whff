@@ -114,9 +114,9 @@ plot(storm_classes_3x3, main= paste("B11 <", threshold), col=c("darkolivegreen3"
 
 # create polygons for damaged areas
 damaged_areas = rasterToPolygons(storm_classes_3x3, fun=function(x){x>0}, dissolve = T)
+area_m2 = area(damaged_areas)
 plotRGB(r_post_storm[[rgb_bands]], stretch="lin", axes=T, main=paste("Strom damage areas ", "(", area_m2, " m2)", sep=""))
 plot(damaged_areas, add=T, border="red")
-area_m2 = area(damaged_areas)
 writeOGR(damaged_areas, output_path, "damaged_areas", driver="ESRI Shapefile")
 
 # print as PDF
