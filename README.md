@@ -9,4 +9,4 @@ Change git user name:
 git config --global user.name "USERNAME"
 
 Change git email address:
-git config --global user.email [EMAIL]
+git config --global user.email EMAIL
