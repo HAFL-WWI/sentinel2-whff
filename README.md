@@ -1,7 +1,7 @@
 # sentinel2-whff
 Sentinel-2 WHFF
 
-## git config
+## git config (Linux RStudio)
 Show git user name and email address (use Terminal window in RStudio):
 git config --global --list
 
