@@ -126,3 +126,10 @@ par(mfrow = c(1, 1))
 # write CSV
 write.csv(df, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/s2_l1c_spectral_data.csv")
 
+# S2 images
+writeRaster(s2_l1c_20170410, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170410.tif")
+writeRaster(s2_l1c_20170430, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170430.tif")
+writeRaster(s2_l1c_20170510, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170510.tif")
+writeRaster(s2_l1c_20170619, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170619.tif")
+writeRaster(s2_l1c_20170818, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170818.tif")
+writeRaster(s2_l1c_20171012, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20171012.tif")
