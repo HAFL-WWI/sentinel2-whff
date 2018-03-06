@@ -11,23 +11,23 @@
 ###### Setup ######
 
 # set working directory
-setwd("//bfhfilerbe01.bfh.ch/vom1/Desktop/20180222_Baumarten_Zwischenergebnisse/")
+setwd("//bfhfilerbe01.bfh.ch/vom1/Desktop/")
 
 # path (WITHOUT BACKSLASH) and name (NO FILE ENDING) of the shapefile to extract response
-SHAPE.PATH = "//bfhfilerbe01.bfh.ch/vom1/Desktop/20180222_Baumarten_Zwischenergebnisse/shapefiles_TBk_MOTI"
-SHAPE.NAME = "20180205_MOTI_PPSS_BGB_buffer6m"
+SHAPE.PATH = "//bfhfilerbe01.bfh.ch/vom1/Desktop/MOTI_Data_shapefile_nurMOTI_Reinheit80_Dg80"
+SHAPE.NAME = "trainingdata_buffer6m"
 
 # response variable
-RESP <- "BAUMART"
+RESP <- "Baumart"
 
 # csv with extracted band values
-INCSV <- "20180222_bands.csv"
+INCSV <- "20180306_bands_dg80.csv"
 
 # dates of the images previously used to extract band values
 DATES <- c("20170311","20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
 
 # output file of bands and response variable (WITH .csv SUFFIX)
-OUTCSV <- "20180227_variables.csv"
+OUTCSV <- "20180306_variables_dg80.csv"
 
 # output pdf file with plotted spectral characteristics
 OUTPDF <- "spectral_charact.pdf"
@@ -50,7 +50,7 @@ df <- read.csv(INCSV)
 moti_shape = readOGR(SHAPE.PATH, SHAPE.NAME)
 
 # add column of class to extracted time series (bands)
-df <- cbind(as.data.frame(moti_shape[,"BAUMART"]), df)
+df <- cbind(as.data.frame(moti_shape[,RESP]), df)
 
 # save .csv
 write.csv(df, OUTCSV, row.names = FALSE)
@@ -68,20 +68,20 @@ for (i in DATES) {
 
 toplot1 <- NULL
 for(i in c(3:length(colnames(df)))) {
-  a <- tapply(df[,i], df$BAUMART, FUN=mean)
+  a <- tapply(df[,i], df[,RESP], FUN=mean)
   toplot1 <- rbind(toplot1, a)
 }
 toplot1 <- as.data.frame(toplot1)
-colnames(toplot1) <- sort(as.character(unique(df$BAUMART)))
+colnames(toplot1) <- sort(as.character(unique(df[,RESP])))
 
 # calculate standard error of bands per species
 toplot2 <- NULL
 for(i in c(3:length(colnames(df)))) {
-  b <- tapply(df[,i], df$BAUMART, FUN=function(x) sd(x)/sqrt(length(x)))
+  b <- tapply(df[,i], df[,RESP], FUN=function(x) sd(x)/sqrt(length(x)))
   toplot2 <- rbind(toplot2, b)
 }
 toplot2 <- as.data.frame(toplot2)
-colnames(toplot2) <- sort(paste(unique(df$BAUMART), "_se", sep=""))
+colnames(toplot2) <- sort(paste(unique(df[,RESP]), "_se", sep=""))
 
 # add date (as DOY)
 date <- substr(colnames(df)[c(3:length(colnames(df)))], 2, 9)
