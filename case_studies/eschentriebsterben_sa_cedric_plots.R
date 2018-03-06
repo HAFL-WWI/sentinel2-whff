@@ -56,6 +56,14 @@ s2_l1c_20170619$NDVI = (s2_l1c_20170619$B8 - s2_l1c_20170619$B4)/(s2_l1c_2017061
 s2_l1c_20170818$NDVI = (s2_l1c_20170818$B8 - s2_l1c_20170818$B4)/(s2_l1c_20170818$B8 + s2_l1c_20170818$B4)
 s2_l1c_20171012$NDVI = (s2_l1c_20171012$B8 - s2_l1c_20171012$B4)/(s2_l1c_20171012$B8 + s2_l1c_20171012$B4)
 
+# NDII (https://www.sciencedirect.com/science/article/pii/S0034425712000119)
+s2_l1c_20170410$NDII = (s2_l1c_20170410$B8 - s2_l1c_20170410$B11)/(s2_l1c_20170410$B8 + s2_l1c_20170410$B11)
+s2_l1c_20170430$NDII = (s2_l1c_20170430$B8 - s2_l1c_20170430$B11)/(s2_l1c_20170430$B8 + s2_l1c_20170430$B11)
+s2_l1c_20170510$NDII = (s2_l1c_20170510$B8 - s2_l1c_20170510$B11)/(s2_l1c_20170510$B8 + s2_l1c_20170510$B11)
+s2_l1c_20170619$NDII = (s2_l1c_20170619$B8 - s2_l1c_20170619$B11)/(s2_l1c_20170619$B8 + s2_l1c_20170619$B11)
+s2_l1c_20170818$NDII = (s2_l1c_20170818$B8 - s2_l1c_20170818$B11)/(s2_l1c_20170818$B8 + s2_l1c_20170818$B11)
+s2_l1c_20171012$NDII = (s2_l1c_20171012$B8 - s2_l1c_20171012$B11)/(s2_l1c_20171012$B8 + s2_l1c_20171012$B11)
+
 # nice names
 names(s2_l1c_20170410) = paste(names(s2_l1c_20170410), "20170410", sep=".")
 names(s2_l1c_20170430) = paste(names(s2_l1c_20170430), "20170430", sep=".")
@@ -86,16 +94,14 @@ df$group = as.factor(df$group)
 
 # compare field and control
 boxplot(df$NDVI.20170510 ~ df$group, main="Sentinel-2 Bild 5. Mai 2017", ylab="NDVI")
+boxplot(df$NDII.20170510 ~ df$group, main="Sentinel-2 Bild 5. Mai 2017", ylab="NDII")
 
 # add field data
 df$class = rep("crtl", length(df))
 df$class[df$group=="field"] = sp_field$class
 df$class = as.factor(df$class)
 
-# write CSV
-write.csv(df, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/s2_l1c_spectral_data.csv")
-
-# plot
+# plot NDVI
 par(mfrow = c(3, 2),oma=c(0,0,2,0))
 plot(df$NDVI.20170410 ~ df$class, main="Sentinel-2 Bild 10. April 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDVI")
 plot(df$NDVI.20170430 ~ df$class, main="Sentinel-2 Bild 30. April 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDVI")
@@ -105,3 +111,25 @@ plot(df$NDVI.20170818 ~ df$class, main="Sentinel-2 Bild 18. August 2017", xlab="
 plot(df$NDVI.20171012 ~ df$class, main="Sentinel-2 Bild 12. Oktober 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDVI")
 title("SA Cédric Eschentriebsterben", outer=TRUE)
 par(mfrow = c(1, 1))
+
+# plot NDII
+par(mfrow = c(3, 2),oma=c(0,0,2,0))
+plot(df$NDII.20170410 ~ df$class, main="Sentinel-2 Bild 10. April 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDII")
+plot(df$NDII.20170430 ~ df$class, main="Sentinel-2 Bild 30. April 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDII")
+plot(df$NDII.20170510 ~ df$class, main="Sentinel-2 Bild 5. Mai 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDII")
+plot(df$NDII.20170619 ~ df$class, main="Sentinel-2 Bild 6. Juni 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDII")
+plot(df$NDII.20170818 ~ df$class, main="Sentinel-2 Bild 18. August 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDII")
+plot(df$NDII.20171012 ~ df$class, main="Sentinel-2 Bild 12. Oktober 2017", xlab="Schadensklasse und Kontrolle (1 tief, 4 hoch)", ylab="NDII")
+title("SA Cédric Eschentriebsterben", outer=TRUE)
+par(mfrow = c(1, 1))
+
+# write CSV
+write.csv(df, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/s2_l1c_spectral_data.csv")
+
+# S2 images
+writeRaster(s2_l1c_20170410, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170410.tif")
+writeRaster(s2_l1c_20170430, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170430.tif")
+writeRaster(s2_l1c_20170510, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170510.tif")
+writeRaster(s2_l1c_20170619, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170619.tif")
+writeRaster(s2_l1c_20170818, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20170818.tif")
+writeRaster(s2_l1c_20171012, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/Data/Sentinel2/s2_l1c_20171012.tif")

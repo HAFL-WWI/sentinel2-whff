@@ -147,6 +147,9 @@ plot(rf.mdl)
 varImpPlot(rf.mdl, type=1, n.var=10)
 print(rf.mdl)
 
+# save model
+saveRDS(rf.mdl, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Eschentriebsterben/SA_Cedric/rf_mdl.rds")
+
 ###########################
 # RUN RF PREDICTION
 
