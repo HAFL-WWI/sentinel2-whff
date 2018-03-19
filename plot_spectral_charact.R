@@ -14,23 +14,23 @@
 setwd("//bfhfilerbe01.bfh.ch/vom1/Desktop/")
 
 # path (WITHOUT BACKSLASH) and name (NO FILE ENDING) of the shapefile to extract response
-SHAPE.PATH = "//bfhfilerbe01.bfh.ch/vom1/Desktop/MOTI_Data_shapefile_nurMOTI_Reinheit80_Dg80"
-SHAPE.NAME = "trainingdata_buffer6m"
+SHAPE.PATH = "C:/local_data/Luftbildbestandeskarte"
+SHAPE.NAME = "samples_ZH"
 
-# response variable
-RESP <- "Baumart"
+# response variable from the shapefile
+RESP <- "BAUMART"
 
-# csv with extracted band values
-INCSV <- "20180306_bands_dg80.csv"
+# input csv with extracted band values
+INCSV <- "bands_ZH.csv"
 
 # dates of the images previously used to extract band values
-DATES <- c("20170311","20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
+DATES <- c("20170328","20170407","20170410","20170430","20170510","20170517","20170527","20170626","20170706","20170815","20170825")
 
 # output file of bands and response variable (WITH .csv SUFFIX)
-OUTCSV <- "20180306_variables_dg80.csv"
+OUTCSV <- "variables_ZH.csv"
 
 # output pdf file with plotted spectral characteristics
-OUTPDF <- "spectral_charact.pdf"
+OUTPDF <- "spectral_charact_ZH.pdf"
 
 ################################################################################################
 
@@ -47,10 +47,12 @@ library(ggplot2)
 df <- read.csv(INCSV)
 
 # load shapefile
-moti_shape = readOGR(SHAPE.PATH, SHAPE.NAME)
+moti_shape <- readOGR(dsn = SHAPE.PATH, layer = SHAPE.NAME) # on Windows
+#SP.PATH = paste(SHAPE.PATH, "/", SHAPE.NAME, ".shp", sep="") # on Linux
+#moti_shape <- readOGR(dsn = SP.PATH) # on Linux
 
 # add column of class to extracted time series (bands)
-df <- cbind(as.data.frame(moti_shape[,RESP]), df)
+df <- cbind(as.data.frame(moti_shape[,RESP])[1], df)
 
 # save .csv
 write.csv(df, OUTCSV, row.names = FALSE)
