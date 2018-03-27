@@ -43,6 +43,8 @@ build_raster_stack <- function(in_dir, out_dir=NULL, ext=NULL, L2A=F) {
   if (!is.null(ext)){
     print("Cropping layers...")
     stk_sub = crop(stk, ext)    
+  } else {
+    stk_sub = stk
   }
 
   # create out dir
