@@ -10,7 +10,7 @@ library(rgeos)
 library(ggplot2)
 
 
-change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir=NULL) {
+change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir) {
 
   print("Loading data...")
   # load stacks
@@ -40,8 +40,8 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir=NU
   # plot true colour RGBs
   rgb_bands = c("B04", "B03", "B02")
   pdf(file=paste(out_dir, "rgb_plots.pdf", sep=""))  
-  plotRGB(r_date1[[rgb_bands]], stretch="lin", axes=T, main="2015")
-  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main="2017")
+  plotRGB(r_date1[[rgb_bands]], stretch="lin", axes=T, main="Date 1")
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main="Date 2")
   dev.off()
   
   # calculate some indices
@@ -81,27 +81,32 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir=NU
   change_positive_poly = rasterToPolygons(change_positive_3x3, fun=function(x){x>0}, dissolve = T)
   change_negative_poly = rasterToPolygons(change_negative_3x3, fun=function(x){x>0}, dissolve = T)
   changed_areas <- rbind(change_positive_poly, change_negative_poly)
-  changed_areas@data$change_type[1] = "positive"
-  changed_areas@data$change_type[2] = "negative"
-  changed_areas@data$change_type = as.factor(changed_areas@data$change_type)
+  changed_areas@data$change[1] = "positive"
+  changed_areas@data$change[2] = "negative"
+  changed_areas@data$change = as.factor(changed_areas@data$change)
   
-  # calculate area
-  area_m2 = sum(area(changed_areas))
+  # disaggregate and mean change per polygon
+  changed_areas = disaggregate(changed_areas)
+  changed_areas$area_m2 = area(changed_areas)
+  changed_areas = changed_areas[changed_areas$area_m2 > 100, ]
+  changed_areas$mean = as.numeric(extract(r_diff$NBR, changed_areas, mean))
 
   print("Final plot and write data...")
   # plot to PDF
   pdf(file=paste(out_dir, "changed_area.pdf", sep=""))  
-  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=paste("Changed area ", "(", area_m2, " m2)", sep=""))
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=paste("Changed area ", "(", sum(changed_areas$area_m2), " m2)", sep=""))
   plot(changed_areas, col=c("green","red"), border=NA, add=T)
   dev.off()
   
-  if (!is.null(out_dir)){
-    # write 
-    writeOGR(changed_areas, out_dir, "changed_areas", driver="ESRI Shapefile")
-    
-    # write Sentinel-2 images
-    writeRaster(r_date1, paste(out_dir, "Date1_image.tif", sep=""))
-    writeRaster(r_date2, paste(out_dir, "Date2_image.tif", sep=""))
-  }
+  # write diff raster
+  writeRaster(r_diff$NBR, paste(out_dir, "diff_", names(r_diff$NBR), ".tif",  sep=""))
+
+  # write shapefile
+  writeOGR(changed_areas, out_dir, "changed_areas", driver="ESRI Shapefile")
+  
+  # write Sentinel-2 images
+  writeRaster(r_date1, paste(out_dir, "Sentinel2_image_date1.tif", sep=""))
+  writeRaster(r_date2, paste(out_dir, "Sentinel2_image_date2.tif", sep=""))
+
   return(changed_areas)
 }
