@@ -21,8 +21,8 @@ s2_2017 = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT
 sp_mask = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/fbb_parzellen_aoi_wgs84.shp"
 
 # Run change detection
-change1 = change_detection_bitemporal(s2_2015, s2_2016, sp_mask, 0.075, out1, c("2015", "2016"))
-change2 = change_detection_bitemporal(s2_2016, s2_2017, sp_mask, 0.075, out2, c("2016", "2017"))
+change1 = change_detection_bitemporal(s2_2015, s2_2016, sp_mask, 0.01, out1, c("2015", "2016"))
+change2 = change_detection_bitemporal(s2_2016, s2_2017, sp_mask, 0.01, out2, c("2016", "2017"))
 
 # multi-year shapefile
 change1$year = rep(2016, nrow(change1@data))
