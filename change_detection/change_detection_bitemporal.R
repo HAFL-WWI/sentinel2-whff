@@ -94,8 +94,9 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir, d
   print("Final plot and write data...")
   # plot to PDF
   pdf(file=paste(out_dir, "changed_area.pdf", sep=""))  
-  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=paste("Changed area ", "(", sum(changed_areas$area_m2), " m2)", sep=""))
-  plot(changed_areas, col=c("green","red"), border=NA, add=T)
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=paste("Changed area ", dates_text[1], " - ", dates_text[2], " (", sum(changed_areas$area_m2), " m2)", sep=""))
+  plot(changed_areas, col=c("red","green")[as.numeric(changed_areas$change)], border=NA, add=T)
+  legend("bottomright", legend=c("Positive change", "Negative change"), col=c("green", "red"), lwd=2.5, cex=0.7)
   dev.off()
   
   # write diff raster
