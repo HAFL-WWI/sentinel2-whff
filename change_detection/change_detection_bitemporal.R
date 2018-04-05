@@ -10,7 +10,7 @@ library(rgeos)
 library(ggplot2)
 
 
-change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir) {
+change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir, dates_text) {
 
   print("Loading data...")
   # load stacks
@@ -40,8 +40,8 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir) {
   # plot true colour RGBs
   rgb_bands = c("B04", "B03", "B02")
   pdf(file=paste(out_dir, "rgb_plots.pdf", sep=""))  
-  plotRGB(r_date1[[rgb_bands]], stretch="lin", axes=T, main="Date 1")
-  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main="Date 2")
+  plotRGB(r_date1[[rgb_bands]], stretch="lin", axes=T, main=dates_text[1])
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=dates_text[2])
   dev.off()
   
   # calculate some indices
@@ -105,8 +105,8 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir) {
   writeOGR(changed_areas, out_dir, "changed_areas", driver="ESRI Shapefile")
   
   # write Sentinel-2 images
-  writeRaster(r_date1, paste(out_dir, "Sentinel2_image_date1.tif", sep=""))
-  writeRaster(r_date2, paste(out_dir, "Sentinel2_image_date2.tif", sep=""))
+  writeRaster(r_date1, paste(out_dir, "Sentinel2_image_", dates_text[1], ".tif", sep=""))
+  writeRaster(r_date2, paste(out_dir, "Sentinel2_image_", dates_text[2], ".tif", sep=""))
 
   return(changed_areas)
 }

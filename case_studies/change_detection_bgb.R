@@ -21,24 +21,37 @@ s2_2017 = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT
 sp_mask = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/fbb_parzellen_aoi_wgs84.shp"
 
 # Run change detection
-change1 = change_detection_bitemporal(s2_2015, s2_2016, sp_mask, 0.1, out1)
-change2 = change_detection_bitemporal(s2_2016, s2_2017, sp_mask, 0.1, out2)
+change1 = change_detection_bitemporal(s2_2015, s2_2016, sp_mask, 0.075, out1, c("2015", "2016"))
+change2 = change_detection_bitemporal(s2_2016, s2_2017, sp_mask, 0.075, out2, c("2016", "2017"))
 
 # multi-year shapefile
-change1$year = rep("2016", nrow(change1@data))
-change2$year = rep("2017", nrow(change2@data))
+change1$year = rep(2016, nrow(change1@data))
+change2$year = rep(2017, nrow(change2@data))
 changed_areas <- rbind(change1, change2)
 
-# positive change is assumed to be negative change in 2015
-changed_areas$year[(changed_areas$year == "2016" & changed_areas$change == "positive")] = "2015"
-changed_areas$year = as.factor(changed_areas$year)
+# positive change is assumed to be negative change in 2015 -> very simple approach
+changed_areas$year[(changed_areas$year == 2016 & changed_areas$change == "positive")] = 2015
 
 # remove positive change between 2016 and 2017
-changed_areas = changed_areas[!(changed_areas$year == "2017" & changed_areas$change == "positive"),]
+changed_areas = changed_areas[!(changed_areas$year == 2017 & changed_areas$change == "positive"),]
+
+# as factor
+changed_areas$year = as.factor(changed_areas$year)
 
 # plot
 plotRGB(stack(s2_2015)[[4:2]], stretch="lin", ext=extent(readOGR(sp_mask)))
 plot(changed_areas, col=c("blue", "yellow", "red")[as.numeric(changed_areas$year)], border=NA, add=T)
 
+# Add VHM mean
+vhm_raster =raster("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/VHM_2m_max_int_wgs84.tif")
+beginCluster()
+vhm_mean = extract(vhm_raster, changed_areas, mean, na.rm=T)
+endCluster()
+changed_areas$VH_mean = as.numeric(vhm_mean)
+
 # write shapefile
 writeOGR(changed_areas, "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/", "change_all",driver="ESRI Shapefile")
+writeOGR(changed_areas[changed_areas$year=="2015",], "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/", "change_2015",driver="ESRI Shapefile")
+writeOGR(changed_areas[changed_areas$year=="2016",], "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/", "change_2016",driver="ESRI Shapefile")
+writeOGR(changed_areas[changed_areas$year=="2017",], "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/", "change_2017",driver="ESRI Shapefile")
+
