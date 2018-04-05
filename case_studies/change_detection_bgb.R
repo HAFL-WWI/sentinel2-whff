@@ -39,8 +39,9 @@ changed_areas = changed_areas[!(changed_areas$year == 2017 & changed_areas$chang
 changed_areas$year = as.factor(changed_areas$year)
 
 # plot
-plotRGB(stack(s2_2015)[[4:2]], stretch="lin", ext=extent(readOGR(sp_mask)))
-plot(changed_areas, col=c("blue", "yellow", "red")[as.numeric(changed_areas$year)], border=NA, add=T)
+plotRGB(stack(s2_2015)[[4:2]], stretch="lin", ext=extent(readOGR(sp_mask)), axes=T, main="Veränderung 2015, 2016, 2017")
+plot(changed_areas, col=c("yellow", "orange", "red")[as.numeric(changed_areas$year)], border=NA, add=T)
+legend("right", legend=c("2015", "2016", "2017"), col=c("yellow", "orange", "red"), lwd=2.5, cex=0.7)
 
 # Add VHM mean
 vhm_raster =raster("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/VHM_2m_max_int_wgs84.tif")
