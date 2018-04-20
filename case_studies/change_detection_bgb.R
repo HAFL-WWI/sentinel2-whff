@@ -18,11 +18,11 @@ s2_2016 = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Sentinel-2/BGB/2016/S2A_OP
 s2_2017 = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/S2A_MSIL1C_20170719T103021_N0205_R108_T32TLT_20170719T103023.tif" # taking July image because no cloud-free August image 
 
 # BGB forest mask
-sp_mask = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/fbb_parzellen_aoi_wgs84.shp"
+sp_mask = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/fbb_aoi_and_wiliwald.shp"
 
 # Run change detection
-change1 = change_detection_bitemporal(s2_2015, s2_2016, sp_mask, 0.1, out1, c("2015", "2016"))
-change2 = change_detection_bitemporal(s2_2016, s2_2017, sp_mask, 0.1, out2, c("2016", "2017"))
+change1 = change_detection_bitemporal(s2_2015, s2_2016, "NBR", sp_mask, 0.1, out1, c("2015", "2016"))
+change2 = change_detection_bitemporal(s2_2016, s2_2017, "NBR", sp_mask, 0.1, out2, c("2016", "2017"))
 
 # multi-year shapefile
 change1$year = rep(2016, nrow(change1@data))
@@ -44,7 +44,7 @@ plot(changed_areas, col=c("yellow", "orange", "red")[as.numeric(changed_areas$ye
 legend("right", legend=c("2015", "2016", "2017"), col=c("yellow", "orange", "red"), lwd=2.5, cex=0.7)
 
 # Add VHM mean
-vhm_raster =raster("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/VHM_2m_max_int_wgs84.tif")
+vhm_raster =raster("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/BGB_Change/VHM_2m_max_wgs84.tif")
 beginCluster()
 vhm_mean = extract(vhm_raster, changed_areas, mean, na.rm=T)
 endCluster()

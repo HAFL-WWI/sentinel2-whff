@@ -10,7 +10,7 @@ library(rgeos)
 library(ggplot2)
 
 
-change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir, dates_text) {
+change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_dir, dates_text) {
 
   print("Loading data...")
   # load stacks
@@ -65,8 +65,8 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir, d
   dev.off()
   
   # set threshold and map changes
-  change_positive = r_diff$NBR > threshold
-  change_negative = r_diff$NBR < -threshold
+  change_positive = r_diff[[band]] > threshold
+  change_negative = r_diff[[band]] < -threshold
 
   # apply median filter
   change_positive_3x3 = focal(change_positive, w=matrix(1,3,3), fun=modal, na.rm=T)
@@ -89,7 +89,7 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir, d
   changed_areas = disaggregate(changed_areas)
   changed_areas$area_m2 = area(changed_areas)
   changed_areas = changed_areas[changed_areas$area_m2 > 100, ]
-  changed_areas$mean = as.numeric(extract(r_diff$NBR, changed_areas, mean))
+  changed_areas$mean = as.numeric(extract(r_diff[[band]], changed_areas, mean))
 
   print("Final plot and write data...")
   # plot to PDF
@@ -100,7 +100,7 @@ change_detection_bitemporal <- function(date1, date2, aoi, threshold, out_dir, d
   dev.off()
   
   # write diff raster
-  writeRaster(r_diff$NBR, paste(out_dir, "diff_", names(r_diff$NBR), ".tif",  sep=""))
+  writeRaster(r_diff[[band]], paste(out_dir, "diff_", names(r_diff[[band]]), ".tif",  sep=""))
 
   # write shapefile
   writeOGR(changed_areas, out_dir, "changed_areas", driver="ESRI Shapefile")
