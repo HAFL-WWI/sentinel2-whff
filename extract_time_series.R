@@ -12,22 +12,26 @@
 library(raster)
 library(rgdal)
 library(sp)
+library(foreach)
+library(doParallel)
+
+start_time <- Sys.time()
 
 ###########################
 # USER CONFIG
 
 # set working directory
-setwd("//home/vom1/RF_output/")
+setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Baumarten_BGB/")
 
 # path (WITH BACKSLASH) to raster stacks and dates for stacks
-STACK_PATH = "//home/vom1/Sentinel-2_final_selection/"
+STACK_PATH = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/"
 STACK_DATES = c("20170311","20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
 
 # Sentinel-2 band names and indices for the corresponding raster stacks
 BAND_NAMES = c("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12")
 
 # path (WITHOUT BACKSLASH) and name (NO FILE ENDING) of the shapefile
-SHAPE.PATH = "//home/vom1/MOTI_Data"
+SHAPE.PATH = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/MOTI/Trainingsdaten_MOTI_PPSS/"
 SHAPE.NAME = "20180205_MOTI_PPSS_BGB_buffer6m"
 
 # ID of the locations from shapefile
@@ -40,8 +44,6 @@ MYFUN <- mean
 
 # name of the output csv file (WITH .csv SUFFIX)
 MYFILE <- "bands_test.csv"
-
-
 
 ###########################
 # LOAD RASTER DATA
@@ -92,7 +94,7 @@ SP.PATH = paste(SHAPE.PATH, "/", SHAPE.NAME, ".shp", sep="") # on Linux
 sdata <- readOGR(dsn = SP.PATH) # on Linux
 sdata@data[,TARGET_VALUE_NAME] = as.factor(sdata@data[,TARGET_VALUE_NAME])
 
-plotRGB(stackList$stack[[1]][[3:1]], stretch="lin", axes=T)
+plotRGB(stackList$stack[[1]][[c("B04","B03","B02")]], stretch="lin", axes=T)
 plot(sdata, add=T, col="red", border="red", lwd=3)
 
 ###########################
@@ -100,11 +102,17 @@ plot(sdata, add=T, col="red", border="red", lwd=3)
 
 print("Prepare predictors and response")
 
-df <- data.frame()
+# prepare multi-core
+# TODO Paralellisation could be improved if all stacks are in one list and not separately for each time
+# TODO No solution found yet to print out progress of foreach loop
+cl = makeCluster(detectCores() -1)
+registerDoParallel(cl)
+iterations <- length(stackList$stack)
 
-for(i in 1:length(stackList$stack)) {
-  print(paste("loading stack:", i, "of", length(stackList$stack)))
-  
+# start raster value extraction
+print(paste("processing", iterations, "stacks parallel"))
+df <- data.frame()
+df = foreach(i=1:iterations, .packages = c("raster"), .combine = "cbind") %dopar% {
   stk <- stackList$stack[[i]]
   colStart <- stackList$columnStart[[i]]
   
@@ -119,20 +127,24 @@ for(i in 1:length(stackList$stack)) {
   if (i==1) {
     df_tmp = data.frame(e.df[,TARGET_VALUE_NAME],e.df[,c(BAND_NAMES)])
     colnames(df_tmp) = c(TARGET_VALUE_NAME, BAND_NAMES)
+    names(df_tmp)[-1] = paste(colStart, colnames(df_tmp)[-1], sep = "")
   } else {
     df_tmp = data.frame(e.df[,c(BAND_NAMES)])
     colnames(df_tmp) = BAND_NAMES
-  }
-  
-  # set colnames again, adding colStart to make colnames unique. Add dt_tmp to df
-  if (length(df) == 0) {
-    names(df_tmp)[-1] = paste(colStart, colnames(df_tmp)[-1], sep = "")
-    df <- df_tmp
-  } else {
     names(df_tmp) = paste(colStart, colnames(df_tmp), sep = "")
-    df <- cbind(df, df_tmp)
   }
+  data.frame(df_tmp)
 }
+
+#end cluster
+stopCluster(cl)
+
+end_time <- Sys.time()
+end_time - start_time
+
+# remove "X"
+# TODO Where is "X" coming from?!
+colnames(df) = gsub("^X", "",  colnames(df))
 
 ###########################
 # SAVE OUTPUT
