@@ -43,7 +43,7 @@ TARGET_VALUE_NAME = "ID__NAME_"
 MYFUN <- mean
 
 # name of the output csv file (WITH .csv SUFFIX)
-MYFILE <- "bands_test.csv"
+MYFILE <- "spectral_data.csv"
 
 ###########################
 # LOAD RASTER DATA
