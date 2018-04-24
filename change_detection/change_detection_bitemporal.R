@@ -10,7 +10,7 @@ library(rgeos)
 library(ggplot2)
 
 
-change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_dir, dates_text) {
+change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_dir, dates_text, min_area=10) {
 
   print("Loading data...")
   # load stacks
@@ -88,7 +88,7 @@ change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_
   # disaggregate and mean change per polygon
   changed_areas = disaggregate(changed_areas)
   changed_areas$area_m2 = area(changed_areas)
-  changed_areas = changed_areas[changed_areas$area_m2 > 100, ]
+  changed_areas = changed_areas[changed_areas$area_m2 >= min_area, ]
   changed_areas$mean = as.numeric(extract(r_diff[[band]], changed_areas, mean))
 
   print("Final plot and write data...")
