@@ -35,7 +35,7 @@ SHAPE.PATH = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/MOTI/Trainingsdaten_MOT
 SHAPE.NAME = "20180205_MOTI_PPSS_BGB_buffer6m"
 
 # ID of the locations from shapefile
-TARGET_VALUE_NAME = "ID__NAME_"
+TARGET_VALUE_NAME = "BAUMART"
 
 # if shapefile represents points or lines, set MYFUN to: NULL
 # if shapefile represents polygons, set MYFUN to:
@@ -116,24 +116,17 @@ df = foreach(i=1:iterations, .packages = c("raster"), .combine = "cbind") %dopar
   stk <- stackList$stack[[i]]
   colStart <- stackList$columnStart[[i]]
   
-  # extract spectral values per plot and bands
-  print("extract spectral values per plot and bands")
-  e = extract(stk, sdata, fun=MYFUN, sp=T, na.rm=T)
-  
-  e.df = data.frame(e@data[,TARGET_VALUE_NAME], e@data[,c(BAND_NAMES)])
-  names(e.df)[1] = TARGET_VALUE_NAME
-  
+  # extract spectral values
+  print("extract spectral values...")
+  df_tmp = extract(stk, sdata, fun=MYFUN, na.rm=T, df=T)[,-1]
+  colnames(df_tmp) = paste(colStart, BAND_NAMES, sep = "")
+
   # copy target variable only in first subset
   if (i==1) {
-    df_tmp = data.frame(e.df[,TARGET_VALUE_NAME],e.df[,c(BAND_NAMES)])
-    colnames(df_tmp) = c(TARGET_VALUE_NAME, BAND_NAMES)
-    names(df_tmp)[-1] = paste(colStart, colnames(df_tmp)[-1], sep = "")
-  } else {
-    df_tmp = data.frame(e.df[,c(BAND_NAMES)])
-    colnames(df_tmp) = BAND_NAMES
-    names(df_tmp) = paste(colStart, colnames(df_tmp), sep = "")
+    df_tmp = cbind(sdata@data[,TARGET_VALUE_NAME], df_tmp)
+    colnames(df_tmp)[1] = TARGET_VALUE_NAME
   }
-  data.frame(df_tmp)
+  return(df_tmp)
 }
 
 #end cluster

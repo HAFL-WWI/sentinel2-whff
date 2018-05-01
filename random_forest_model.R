@@ -3,15 +3,16 @@
 # Run random forest model on per image extracted band values and selected
 # vegetation indexes, balance sample size, drop selected species
 #
+# (c) HAFL, BFH
 ############################################################################
 
 ###### Setup ######
 
 # set working directory
-setwd("//bfhfilerbe01.bfh.ch/vom1/Desktop/20180222_Baumarten_Zwischenergebnisse/")
+setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Baumarten_BGB/")
 
 # input file of bands and response variable (WITH .csv SUFFIX)
-INCSV <- "20180227_variables.csv"
+INCSV <- "spectral_data.csv"
 
 # name random forest file
 OUTRF <- "myrf.RData"
