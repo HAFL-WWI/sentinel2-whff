@@ -134,12 +134,14 @@ writeRaster(rf.prediction, PREDICTION.FILE, overwrite=T)
 
 # calculate probability for each of the classes/species separately (function predict from the raster package), than save maximum value of the classes only
 # how hight is the probability of the selected class (the class with highest probability)
-rf.prediction.prob <- NULL
 stk <- NULL
-
 for (i in 1:length(levels(rf.mdl$predicted))) {
-  rf.prediction.prob1 <- predict(finalStack, rf.mdl, type="prob", index=i, na.rm=FALSE)
-  stk <- stack(c(rf.prediction.prob,rf.prediction.prob1))
+  rf.prediction.prob <- predict(finalStack, rf.mdl, type="prob", index=i, na.rm=FALSE)
+
+  if (i == 1)
+    stk = rf.prediction.prob
+  else
+    stk = stack(stk, rf.prediction.prob) 
 }
 
 rMaxProb = calc(stk, max)
