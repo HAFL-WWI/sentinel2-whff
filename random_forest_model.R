@@ -12,25 +12,25 @@
 setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Baumarten_BGB/")
 
 # input file of bands and response variable (WITH .csv SUFFIX)
-INCSV <- "spectral_data.csv"
+INCSV <- "spectral_data_nh_lh.csv"
 
 # name random forest file
 OUTRF <- "myrf.RData"
 
 # set number of samples per class
-SAMPLESIZE <- 100
+SAMPLESIZE <- 300
 
 # dates of the images previously used to extract band values
 DATES <- c("20170311","20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
 
 # drop tree species
-DROPSP <- c("Dou", "Foe")
+DROPSP <- c()
 
 # response variable (CHANGE MANUALLY at line 73!)
 RESP <- "BAUMART"
 
 ##############################################################################################
-
+# set.seed(200)
 ### Load library ###
 
 library(randomForest)
@@ -41,10 +41,10 @@ library(randomForest)
 df <- read.csv(INCSV)
 
 # drop ID
-df[,2] <- NULL
+drop_cols = c()
+df[,drop_cols] <- NULL
 
 # drop some species/samples excluded
-
 for (i in DROPSP) df <- subset(df, df[,RESP]!=i)
 df[,RESP] <- droplevels(df[,RESP])
 
@@ -80,7 +80,7 @@ table(df1[,RESP])
 
 rf.mdl <- randomForest(BAUMART ~ ., data=df1, ntree=500, importance=TRUE, na.action=na.omit)
 rf.mdl
-save(rf.mdl,file = OUTRF)
+# save(rf.mdl,file = OUTRF)
 
 
 
