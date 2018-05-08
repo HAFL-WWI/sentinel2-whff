@@ -24,15 +24,15 @@ start_time <- Sys.time()
 setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Baumarten_BGB/")
 
 # path (WITH BACKSLASH) to raster stacks and dates for stacks
-STACK_PATH = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI2Ap/GeoTIFF/T32TLT/2017/"
-STACK_DATES = c("20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
+STACK_PATH = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/"
+STACK_DATES = c("20170311","20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
 
 # Sentinel-2 band names and indices for the corresponding raster stacks
 BAND_NAMES = c("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B11", "B12")
 
 # path (WITHOUT BACKSLASH) and name (NO FILE ENDING) of the shapefile
 SHAPE.PATH = "//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/MOTI/Trainingsdaten_MOTI_PPSS/"
-SHAPE.NAME = "20180205_MOTI_PPSS_BGB_buffer6m"
+SHAPE.NAME = "20180205_MOTI_PPSS_BGB_buffer6m_Lae_manuell_korrigiert"
 
 # ID of the locations from shapefile
 TARGET_VALUE_NAME = "BAUMART"
@@ -43,7 +43,7 @@ TARGET_VALUE_NAME = "BAUMART"
 MYFUN <- mean
 
 # name of the output csv file (WITH .csv SUFFIX)
-MYFILE <- "spectral_data_l2a.csv"
+MYFILE <- "spectral_data_l1c_lae_korrigiert.csv"
 
 ###########################
 # LOAD RASTER DATA

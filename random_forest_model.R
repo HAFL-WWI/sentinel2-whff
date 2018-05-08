@@ -12,7 +12,7 @@
 setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Baumarten_BGB/")
 
 # input file of bands and response variable (WITH .csv SUFFIX)
-INCSV <- "spectral_data_l1c_l2a.csv"
+INCSV <- "spectral_data_l1c_lae_korrigiert.csv"
 
 # name random forest file
 OUTRF <- "myrf.RData"
@@ -24,7 +24,7 @@ SAMPLESIZE <- 100
 DATES <- c("20170311","20170410","20170430","20170510","20170619","20170719","20170818","20171007","20171017")
 
 # drop tree species
-DROPSP <- c("Dou","Foe")
+DROPSP <- c()
 
 # response variable (CHANGE MANUALLY at line 73!)
 RESP <- "BAUMART"
@@ -74,9 +74,9 @@ for (i in levels(df[,RESP])) {
 
 # check number of samples per class
 table(df1[,RESP])
+# df1 = df1[,c(1, grep("20170311|20170510|20170619|20170818|20171017",colnames(df1)))]
 
 ### Run random forest ###
-
 rf.mdl <- randomForest(BAUMART ~ ., data=df1, ntree=500, importance=TRUE, na.action=na.omit)
 rf.mdl
 save(rf.mdl,file = OUTRF)
