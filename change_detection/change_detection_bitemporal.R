@@ -12,7 +12,9 @@ library(ggplot2)
 
 # Custom change detection function
 change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_dir, dates_text, min_area=10) {
-
+  # create out dir
+  dir.create(out_dir, showWarnings = T, recursive = T)
+  
   # load Sentinel-2 image stacks
   print("Loading data...")
   r_date1 = stack(date1)
