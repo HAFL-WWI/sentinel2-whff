@@ -1,6 +1,7 @@
 ############################################################
 # Build GeoTiff raster stacks from JP2 Sentinel-2 data
-# for a defined extent.
+# for a defined extent or for the whole scene.
+# -> resample to 10m and stack
 #
 # by Dominique Weber, HAFL, BFH
 # 
