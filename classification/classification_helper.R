@@ -51,6 +51,17 @@ get_stack_list <- function(stack_path, stack_dates, layer_names, layer_indices) 
 }
 
 ############################################################
+# Plot images
+plot_images <- function(stack_list, extent) {
+  rgb_bands = c("B4", "B3", "B2")
+  pdf("Sentinel2_images_rgb.pdf")
+  for(i in 1:length(stack_list$stacks)){
+    plotRGB(stack_list$stacks[[i]][[rgb_bands]], stretch="hist", axes=T, ext=extent, main=paste("RGB vom", stack_list$dates[i]))
+  }
+  dev.off()
+}
+
+############################################################
 # Extract values from raster stack list at given spatial locations
 extract_time_series <- function(stack_list, sp, response_variable) {
   # load multi core libraries

@@ -19,7 +19,7 @@ setwd("/mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/TBk_Lausanne/")
 
 # path (WITH BACKSLASH) and dates for stacks
 STACK_PATH = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLS/2017/"
-STACK_DATES = c("20170311", "20170510","20170619","20170818")
+STACK_DATES = c("20170219", "20170311", "20170410", "20170420", "20170510" ,"20170530", "20170619","20170818", "20171007")
 
 # path for training data shapefile
 SP.PATH = "trainingdata.shp"
@@ -41,7 +41,8 @@ PROBABILITY.FILE= "forest_type_prob.tif"
 ###########################
 # LOAD SENTINEL-2 IMAGES
 stackList = get_stack_list(STACK_PATH, STACK_DATES, BAND_NAMES, BAND_INDICES)
-
+plot_images(stackList, EXTENT)
+  
 ###########################
 # LOAD TRAINING DATA
 training_data <- readOGR(dsn = SP.PATH)
