@@ -11,7 +11,7 @@ library(rgeos)
 library(ggplot2)
 
 # Custom change detection function
-change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_dir, dates_text, min_area=10) {
+change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_dir, dates_text, min_area=10, type_neg=T, type_pos=T) {
   # create out dir
   dir.create(out_dir, showWarnings = T, recursive = T)
   
@@ -91,12 +91,29 @@ change_detection_bitemporal <- function(date1, date2, band, aoi, threshold, out_
   changed_areas = changed_areas[changed_areas$area_m2 >= min_area, ]
   changed_areas$mean = as.numeric(extract(r_diff[[band]], changed_areas, mean))
 
-  # plot to PDF
+  
+  # Filter negative or positive change
+  if (!type_neg){
+    changed_areas = changed_areas[changed_areas$change != "negative",]}
+  if (!type_pos){
+    changed_areas = changed_areas[changed_areas$change != "positive",]}
+  
+  # FINAL PLOTS -> PDFs
   print("Final plot and write data...")
   pdf(file=paste(out_dir, "changed_area.pdf", sep=""))  
   plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=paste("Changed area ", dates_text[1], " - ", dates_text[2], " (", sum(changed_areas$area_m2), " m2)", sep=""))
   plot(changed_areas, col=c("red","green")[as.numeric(changed_areas$change)], border=NA, add=T)
   legend("bottomright", legend=c("Positive change", "Negative change"), col=c("green", "red"), lwd=2.5, cex=0.7)
+  dev.off()
+
+  print("Overview plot...")
+  pdf(file=paste(out_dir, "change_overview.pdf", sep="")) 
+  plotRGB(r_date1[[rgb_bands]], stretch="lin", axes=T, main=dates_text[1])
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=dates_text[2])
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main="Change")
+  plot(changed_areas, col=c("red","green")[as.numeric(changed_areas$change)], border=NA, add=T)
+  plotRGB(r_date2[[rgb_bands]], stretch="lin", axes=T, main=paste(band, "Diff"))
+  plot(r_diff[[band]], axes=T, add=T)
   dev.off()
   
   # write diff raster
