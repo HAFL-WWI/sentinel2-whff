@@ -1,8 +1,7 @@
 ############################################################
-# Access and plot Sentinel-2 time series
+# Extract time series information (NDVI)
 #
 # by Dominique Weber, HAFL, BFH
-# 
 ############################################################
 
 library(raster)
@@ -11,12 +10,12 @@ library(reshape2)
 library(ggplot2)
 
 # set wd
-setwd("//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/")
+setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/")
 
 # load sentinel-2 images
-stk.20170510 = stack("S2A_MSIL1C_20170510T103031_N0205_R108_T32TLT_20170510T103025.tif")
-stk.20170619 = stack("S2A_MSIL1C_20170619T103021_N0205_R108_T32TLT_20170619T103021.tif")
-stk.20170818 = stack("S2A_MSIL1C_20170818T103021_N0205_R108_T32TLT_20170818T103421.tif")
+stk.20170510 = stack("//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/S2A_MSIL1C_20170510T103031_N0205_R108_T32TLT_20170510T103025.tif")
+stk.20170619 = stack("//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/S2A_MSIL1C_20170619T103021_N0205_R108_T32TLT_20170619T103021.tif")
+stk.20170818 = stack("//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TLT/2017/S2A_MSIL1C_20170818T103021_N0205_R108_T32TLT_20170818T103421.tif")
 
 # read moti data
 sdata <- readOGR("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/test_data/MOTI_PPSS_Michaela/20180123-2_MOTI_PPSS.shp")

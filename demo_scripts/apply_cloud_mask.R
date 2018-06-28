@@ -2,7 +2,6 @@
 # Apply cloud mask
 #
 # by Dominique Weber, HAFL, BFH
-# 
 ############################################################
 
 library(raster)

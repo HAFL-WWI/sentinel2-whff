@@ -1,4 +1,9 @@
-# Validierung ZH
+############################################################
+# Validation tree species classification ZH
+#
+# by Dominique Weber, HAFL, BFH
+############################################################
+
 
 # Baumarten Codes (Raster Klassifikation):
 # 1: Es_Ah
@@ -82,4 +87,3 @@ sp_sub$SAME = (sp_sub$BamrtBK == sp_sub$BamrtS2)
 
 # write output
 writeOGR(sp_sub,".", "Vergleich_BK_and_S2_filtered", driver="ESRI Shapefile", overwrite_layer = T)
-
