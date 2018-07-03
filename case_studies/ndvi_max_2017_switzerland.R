@@ -47,14 +47,19 @@ ndvi_max_2017_t32tns = calc_pixel_composites(images_path, band_names, dates_2017
 images_path = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TMR/2017/"
 ndvi_max_2017_t32tmr = calc_pixel_composites(images_path, band_names, dates_2017_filter, "2017_t32tmr", calc_ndvi, max)
 
-# 2017 T31TGM 
-# TODO a bit tricky because different UTM zone -> not sure if fully correct
+# 2017 T31TGM (-> UTM zone 31!)
 images_path = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T31TGM/2017/"
 ndvi_max_2017_t31tgm = calc_pixel_composites(images_path, band_names, dates_2017_filter, "2017_t31tgm", calc_ndvi, max)
+
+# Problem different utm zones
+# There is no easy solution. We tried projectRaster to UTM32 and to LV95 but then rasters have different origins, resolution or row/col numbers
+
+# The only solution that worked so far is this (but somehow then ArcGIS had problem with the resulting mosaic):
 # reproject, extend and resample
-ndvi_max_2017_t31tgm_32 = projectRaster(ndvi_max_2017_t31tgm, crs=crs(ndvi_max_2017_t32tls))
-extend_32tls = extend(ndvi_max_2017_t32tls, ndvi_max_2017_t31tgm_32)
-ndvi_max_2017_t31tgm_32_resampled = resample(ndvi_max_2017_t31tgm_32, extend_32tls)
+# ndvi_max_2017_t31tgm_32 = projectRaster(ndvi_max_2017_t31tgm, crs=crs(ndvi_max_2017_t32tls))
+# extend_32tls = extend(ndvi_max_2017_t32tls, ndvi_max_2017_t31tgm_32)
+# ndvi_max_2017_t31tgm_32_resampled = resample(ndvi_max_2017_t31tgm_32, extend_32tls)
+# mosaic all...
 
 # create mosaic
 ndvi_max_2017_ch = mosaic(ndvi_max_2017_t32tlt,
@@ -64,9 +69,11 @@ ndvi_max_2017_ch = mosaic(ndvi_max_2017_t32tlt,
                           ndvi_max_2017_t32tnt,
                           ndvi_max_2017_t32tns,
                           ndvi_max_2017_t32tmr,
-                          ndvi_max_2017_t31tgm_32_resampled,
                           fun=max, 
                           filename="ndvi_max_2017_ch.tif")
+
+# write T31TGM separately
+writeRaster(ndvi_max_2017_t31tgm, "ndvi_max_2017_t31tgm.tif")
 
 print(Sys.time() - start_time)
 
