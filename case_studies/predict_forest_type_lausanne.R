@@ -1,5 +1,5 @@
 ############################################################################
-# Predict forest type for Lausanne
+# Predict forest type for Lausanne (Laub / Nadelholz)
 #
 # (c) by Dominique Weber, HAFL, BFH
 ############################################################################
@@ -64,7 +64,6 @@ predictionStack = create_prediction_stack(stackList, EXTENT)
 
 ###########################
 # RUN PREDICTION
-
 print("Run model prediction")
 beginCluster()
 nClasses = length(rf.mdl$classes)
