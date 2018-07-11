@@ -5,7 +5,7 @@
 ############################################################
 
 # Pixel composites based on VI and composite function
-calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun, composite_fun=max) {
+calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun, composite_fun=max, ext=NULL) {
   # load packages
   library(raster)
   library(rgdal)
@@ -43,6 +43,9 @@ calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun,
   # calculate composite based on function provided (i.e. max)
   print("Building composite...")
   pixel_composite = calc(vi_stk, composite_fun, na.rm=T)
+  
+  # crop
+  if (!is.null(extent)) pixel_composite = crop(pixel_composite, ext)
   
   # plot composites in PDF
   pdf(paste("composite_", txt, ".pdf", sep=""))
