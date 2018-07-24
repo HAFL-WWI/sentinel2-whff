@@ -16,12 +16,13 @@ setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Surselva_Geb/")
 
 # global params
 band_names = c("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10","B11", "B12")
-dates_2017_filter = c("201706", "201707")
+dates_2017_filter = c("20170619", "20170626", "20170706", "20170719")
 sp = readOGR("Bezirk_Surselva_wgs84.shp")
 
 # 2017 T32TMS
 images_path = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TMS/2017/"
 ndvi_max_2017_t32tms = calc_pixel_composites(images_path, band_names, dates_2017_filter, "2017_t32tms", calc_ndvi, max, extent(sp))
+writeRaster(ndvi_max_2017_t32tms, "ndvi_max_2017_t32tms.tif")
 
 ######################################
 # calc NDVI max bap composite
@@ -32,6 +33,7 @@ fileNames = fileNames[grep("tif$", fileNames)]
 fileNames = fileNames[grepl(paste(dates_2017_filter, collapse="|"), fileNames)]
 fileNames = paste(images_path, fileNames, sep="")
 
+# prepare mask and full stack
 mask_stk = stack()
 full_stk = stack()
 pdf("rgb_plots.pdf")
@@ -50,7 +52,7 @@ for(i in 1:length(fileNames)){
 }
 dev.off()
 
-# mask
+# mask ndvi max pixels
 nLayers = 13
 masked_stk = stack()
 for(i in 1:nlayers(mask_stk)){
@@ -58,7 +60,7 @@ for(i in 1:nlayers(mask_stk)){
   masked_stk = addLayer(masked_stk, mask(full_stk[[ind_tmp]], mask_stk[[i]], maskvalue=0))
 }
 
-# composite
+# build composite
 stk_composite = masked_stk[[1:nLayers]]
 names(stk_composite) = band_names
 for(i in 1:nlayers(stk_composite)){
@@ -67,7 +69,13 @@ for(i in 1:nlayers(stk_composite)){
   stk_composite[[i]] = calc(stk_tmp, max)
 }
 
+# proper naming
 names(stk_composite) = band_names
-pdf("composite_rgb.pdf")
+
+# plot composite
+pdf("composite.pdf")
+plotRGB(stk_composite[[c("B04","B03","B02")]], stretch="lin")
 plotRGB(stk_composite[[c("B11","B08","B04")]], stretch="lin")
 dev.off()
+
+writeRaster(stk_composite, "summer_2017_composite.tif")

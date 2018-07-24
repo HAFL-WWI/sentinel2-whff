@@ -67,10 +67,7 @@ extract_time_series <- function(stack_list, sp, response_variable) {
   # load multi core libraries
   library(foreach)
   library(doParallel)
-  
-  # get band names
-  band_names = stack_list$bands
-  
+
   # prepare multi-core
   print("Prepare multi-core processing...")
   start_time <- Sys.time()
@@ -110,6 +107,35 @@ extract_time_series <- function(stack_list, sp, response_variable) {
   #end cluster
   stopCluster(cl)
 
+  print(paste("processing time:", Sys.time() - start_time))
+  return(df)
+}
+
+
+############################################################
+# Extract values from raster at given spatial locations
+extract_raster_values <- function(r, sp, response_variable) {
+  # load multi core libraries
+  library(foreach)
+  library(doParallel)
+  
+  # prepare multi-core
+  print("Prepare multi-core processing...")
+  start_time <- Sys.time()
+  cl = makeCluster(detectCores() -1)
+  registerDoParallel(cl)
+  
+  # start raster value extraction
+  df = foreach(j=1:length(sp), .packages = c("raster"), .combine = "rbind") %dopar% {
+    extract(r, sp[j,], fun=median, na.rm=T, df=T)
+  }
+
+  df = cbind(sp@data[,response_variable], df)
+  colnames(df)[1] = response_variable
+  
+  #end cluster
+  stopCluster(cl)
+  
   print(paste("processing time:", Sys.time() - start_time))
   return(df)
 }
