@@ -45,7 +45,7 @@ calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun,
   pixel_composite = calc(vi_stk, composite_fun, na.rm=T)
   
   # crop
-  if (!is.null(extent)) pixel_composite = crop(pixel_composite, ext)
+  if (!is.null(ext)) pixel_composite = crop(pixel_composite, ext)
   
   # plot composites in PDF
   pdf(paste("composite_", txt, ".pdf", sep=""))
