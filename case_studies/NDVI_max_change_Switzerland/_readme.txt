@@ -1,0 +1,1 @@
+Full mosaic including t31tgm and NDVI-Difference (Minus Tool) was generate with ArcGIS Pro (see printscreens).

@@ -1,0 +1,7 @@
+# ONLY TAKES A COUPLE MINUTES!
+
+# rasterize polygon, using xmin etc. from Sentinel-2 NDVI raster to snap and align cells
+gdal_rasterize -burn 1 -tr 10 10 -te 264850.0, 5073820.0, 609780.0, 5295110.0 -ot Byte -init 255 -a_nodata 255 -co COMPRESS=LZW Z_Wald_wgs84.shp forest_mask.tif
+
+# mask NDVI raster
+gdal_calc.py -A ndvi_max_ch_diff_2018_2017.tif -B forest_mask.tif --outfile=ndvi_max_ch_forest_diff_2018_2017.tif --calc="A*(B==1)" --co="COMPRESS=LZW" --type='Float32'
