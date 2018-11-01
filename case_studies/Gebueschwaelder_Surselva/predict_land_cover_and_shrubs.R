@@ -19,7 +19,7 @@ setwd("/mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Surselva_Geb/")
 
 # path (WITH BACKSLASH) and dates for stacks
 STACK_PATH = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TMS/2017/"
-STACK_DATES = c("20170328", "20170517","20170527", "20170626", "20170825", "20171014", "20171103")
+STACK_DATES = c("20170328", "20170527", "20170626","20171014")
 
 # path for training data shapefile
 SP.PATH = "training_data_geostat.shp"

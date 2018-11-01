@@ -52,7 +52,7 @@ get_stack_list <- function(stack_path, stack_dates, layer_names, layer_indices) 
 
 ############################################################
 # Plot images
-plot_images <- function(stack_list, extent) {
+plot_images <- function(stack_list, extent=NULL) {
   rgb_bands = c("B4", "B3", "B2")
   pdf("Sentinel2_images_rgb.pdf")
   for(i in 1:length(stack_list$stacks)){

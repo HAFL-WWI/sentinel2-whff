@@ -1,5 +1,5 @@
 ############################################################
-# Create BAP composite based on NDVI max from June/July
+# Create BAP composite based on NDVI max summer values
 # -> Most vegetated pixel composite -> but has some limitations
 # snow and water pixels as well as some other artefacts.  
 #
@@ -7,6 +7,8 @@
 ############################################################
 library(raster)
 library(rgdal)
+
+start_time <- Sys.time()
 
 source("/home/wbd3/sentinel2-whff/vegetation_indices/calc_vegetation_indices.R")
 source("/home/wbd3/sentinel2-whff/composites/calc_pixel_composites.R")
@@ -16,13 +18,15 @@ setwd("//mnt/cephfs/data/HAFL/WWI-Sentinel-2/Data/Surselva_Geb/")
 
 # global params
 band_names = c("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B09", "B10","B11", "B12")
-dates_2017_filter = c("20170619", "20170626", "20170706", "20170719")
-sp = readOGR("Bezirk_Surselva_wgs84.shp")
+dates_filter = c("20170716","20170805","20170815", "20170825", "20170830")
+sp = readOGR("Kanton_GR_wgs84.shp")
 
 # 2017 T32TMS
 images_path = "//mnt/cephfs/data/BFH/Geodata/World/Sentinel-2/S2MSI1C/GeoTIFF/T32TMS/2017/"
-ndvi_max_2017_t32tms = calc_pixel_composites(images_path, band_names, dates_2017_filter, "2017_t32tms", calc_ndvi, max, extent(sp))
+ndvi_max_2017_t32tms = calc_pixel_composites(images_path, band_names, dates_filter, "2017_t32tms", calc_ndvi, max, extent(sp))
 writeRaster(ndvi_max_2017_t32tms, "ndvi_max_2017_t32tms.tif")
+
+print(Sys.time() - start_time)
 
 ######################################
 # calc NDVI max bap composite
@@ -30,7 +34,7 @@ writeRaster(ndvi_max_2017_t32tms, "ndvi_max_2017_t32tms.tif")
 # filter .tif files and dates
 fileNames = list.files(images_path)
 fileNames = fileNames[grep("tif$", fileNames)]
-fileNames = fileNames[grepl(paste(dates_2017_filter, collapse="|"), fileNames)]
+fileNames = fileNames[grepl(paste(dates_filter, collapse="|"), fileNames)]
 fileNames = paste(images_path, fileNames, sep="")
 
 # prepare mask and full stack
@@ -79,3 +83,5 @@ plotRGB(stk_composite[[c("B11","B08","B04")]], stretch="lin")
 dev.off()
 
 writeRaster(stk_composite, "summer_2017_composite.tif")
+
+print(Sys.time() - start_time)
