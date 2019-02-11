@@ -20,6 +20,7 @@ build_raster_stack <- function(in_dir, out_dir=NULL, ext=NULL, L2A=F) {
     files <- list.files(in_dir, pattern = "\\.jp2$", full.names=T) 
   }
   
+  # TODO multi-core implementation
   # build resampled stack
   stk = stack()
   print("Stacking layers...")
@@ -49,10 +50,10 @@ build_raster_stack <- function(in_dir, out_dir=NULL, ext=NULL, L2A=F) {
   # create out dir
   if (!is.null(out_dir)){
     file_name = basename(files[[1]])
-    out_path = paste(out_dir, substr(file_name, 1, 19), "_sub",".tif", sep="")
+    out_path = paste(out_dir, substr(file_name, 1, 19), "_stack",".tif", sep="")
     print(paste("write raster:", out_path))
     dir.create(out_dir, showWarnings = T)
-    writeRaster(stk_sub, out_path)
+    writeRaster(stk_sub, out_path, datatype="INT2U")
   }
   return(stk_sub)
 }
