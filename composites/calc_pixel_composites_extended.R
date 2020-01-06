@@ -1,7 +1,7 @@
-############################################################
+#############################################################
 # Greenest pixel (NDVI max, NBR min) composite
 #
-# by Dominique Weber, HAFL, BFH
+# by Dominique Weber & Alexandra Erbach, HAFL, BFH
 ############################################################
 
 # Pixel composites based on VI and composite function
@@ -43,29 +43,32 @@ calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun,
     
     # calculate indices
     vi_tmp = stack_fun(stk_tmp)
+    vi_tmp_2 = calc_nbr(stk_tmp)
+    
+    vi_tmp = stack(vi_tmp, vi_tmp_2)
     return(vi_tmp)
   }
   
   # calculate composite based on function provided (i.e. max)
   print("Building composite...")
-  pixel_composite = calc(vi_stk, max, na.rm=T)
+  if (ind==F){
+    ndvi_stk = subset(vi_stk, subset=1:length(fileNames))
+    pixel_composite = calc(ndvi_stk, max, na.rm=T)
+    
+    # crop
+    if (!is.null(ext)) pixel_composite = crop(pixel_composite, ext)
+  }
+
   
-  # calculate index raster
   if (ind==T){
+    # calculate index raster
+    ind_raster <- which.max(ndvi_stk)  # Achtung eigentlich müsste man unterscheiden nach composite function min/max
     
-    ind_raster <- which.max(vi_stk)  # Achtung eigentlich müsste man unterscheiden nach composite function min/max
+    # nbr stack
+    nbr_stk = subset(vi_stk, subset=(1+length(fileNames)):nlayers(vi_stk))
     
-    # apply stack function for calculation of nbr
-    nbr_stk = foreach(i=1:length(fileNames), .packages = c("raster"), .combine = "addLayer") %dopar% {
-      print(paste("processing", i, "of", length(fileNames),"..."))
-      # get stack
-      stk_tmp = stack(fileNames[i])
-      names(stk_tmp) = band_names
-      
-      # calculate indices
-      vi_tmp = calc_nbr(stk_tmp)
-      return(vi_tmp)
-    }
+    # NDVI composite
+    ndvi_composite = stackSelect(ndvi_stk, ind_raster)
     
     # NBR composite
     nbr_composite = stackSelect(nbr_stk, ind_raster)
@@ -87,19 +90,16 @@ calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun,
       date_ras[date_ras==i] <- substring(strsplit(files[i],"_")[[1]][3],1,8)
     }
     
-    composite_all = stack(pixel_composite, ind_raster, date_ras, rgb_composite, nbr_composite)
+    composite_all = stack(ndvi_composite, ind_raster, date_ras, rgb_composite, nbr_composite)
     
     # crop
     if (!is.null(ext)) composite_all = crop(composite_all, ext)
   }
   
-  # crop
-  if (!is.null(ext)) pixel_composite = crop(pixel_composite, ext)
-  
   # plot composites in PDF
-  pdf(paste("composite_", txt, ".pdf", sep=""))
-  plot(pixel_composite)
-  dev.off()
+  #pdf(paste("composite_", txt, ".pdf", sep=""))
+  #plot(pixel_composite)
+  #dev.off()
   
   # stop cluster only here, otherwise tmp files may get lost
   stopCluster(cl)
