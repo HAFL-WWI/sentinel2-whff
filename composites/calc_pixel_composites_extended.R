@@ -51,10 +51,11 @@ calc_pixel_composites <- function(stack_path, band_names, dates, txt, stack_fun,
   
   # calculate composite based on function provided (i.e. max)
   print("Building composite...")
+  
+  ndvi_stk = subset(vi_stk, subset=1:length(fileNames))
+  
   if (ind==F){
-    ndvi_stk = subset(vi_stk, subset=1:length(fileNames))
     pixel_composite = calc(ndvi_stk, max, na.rm=T)
-    
     # crop
     if (!is.null(ext)) pixel_composite = crop(pixel_composite, ext)
   }
